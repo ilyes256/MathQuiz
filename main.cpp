@@ -264,6 +264,9 @@ double get_correct_result(const Question& question) {
 		return question.number_one * question.number_two;
 		break;
 	case EN_QUESTIONS_TYPE::DIV:
+		if (question.number_two == 0) {
+			return 0; 
+		}
 		return question.number_one / question.number_two;
 		break;
 
