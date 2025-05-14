@@ -420,10 +420,12 @@ void start_quiz(Quiz &quiz) {
 	display_quiz_results(quiz);
 }
 
+//take quiz
 void take_quiz(Quiz& quiz) {
 	
 	while (true) {
 		
+		//start quiz
 		start_quiz(quiz);
 		if (want_to_take_another_quiz() == EN_TAKE_ONOTHER_QUIZ::NO) {
 			break;
@@ -438,6 +440,7 @@ int main()
 {
 	srand(time(nullptr));
 	Quiz quiz;
+	
 	take_quiz(quiz);
 	return 0;
 }
