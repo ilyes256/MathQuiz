@@ -8,16 +8,16 @@ using namespace std;
 enum EN_QUESTIONS_LEVEL{EASY=1,MID,HARD,LVL_MIX,LVL_NOT_KNOWN};
 string questions_level_text[5] = { "","Easy","Mid","Hard","Mix" };
 
-enum EN_QUESTIONS_TYPE{ADD=1,SUB,MUL,DIV,QT_MIX,NOT_KNOWN};
-string question_type_text[6] = { "","Add","Sub","Mul","Div","Mix" };
+enum EN_OPERATION_TYPE {ADD=1,SUB,MUL,DIV,QT_MIX,NOT_KNOWN};
+string operation_type_text[6] = { "","Add","Sub","Mul","Div","Mix" };
+char operation_type_symbol[5] = { ' ','+','-','*','/' };
 
 enum EN_QUESTION_RESULT{WRONG=0,CORRECT,QUESTION_RESULT_NOT_KNOWN};
 string question_result_text[2] = { "Wrong","Correct"};
 string question_result_message_text[2] = { ":(",":)" };
 
 
-enum EN_OPERATION_TYPE{ OP_ADD=1, OP_SUB, OP_MUL, OP_DIV,OP_NOT_KNOWN };
-char operation_type_char[5] = { ' ','+','-','*','/'};
+
 
 
 enum EN_NUMBER_RANGE{EASY_MIN=1,EASY_MAX=99,MID_MIN=100,MID_MAX=999,HARD_MIN=1000,HARD_MAX=9999};
@@ -54,7 +54,7 @@ struct Question {
 struct Quiz {
     int num_quetions;
 	EN_QUESTIONS_LEVEL questions_level;
-	EN_QUESTIONS_TYPE questions_type;
+	EN_OPERATION_TYPE operation_type;
 	Question questions[100];
 	int number_right_answers;
 	int number_wrong_answers;
@@ -157,24 +157,24 @@ EN_QUESTIONS_LEVEL get_questions_level_based_on_number_generated(int number) {
 
 EN_OPERATION_TYPE generate_random_operation_type() {
 
-	return (EN_OPERATION_TYPE)generate_random_number(EN_OPERATION_TYPE::OP_ADD, EN_OPERATION_TYPE::OP_DIV);
+	return (EN_OPERATION_TYPE)generate_random_number(EN_OPERATION_TYPE::ADD, EN_OPERATION_TYPE::DIV);
 }
 
-EN_OPERATION_TYPE get_operation_type(EN_QUESTIONS_TYPE questions_type) {
+EN_OPERATION_TYPE get_operation_type(EN_OPERATION_TYPE operation_type) {
 
-	switch (questions_type)
+	switch (operation_type)
 	{
 	case ADD:
-		return EN_OPERATION_TYPE::OP_ADD;
+		return EN_OPERATION_TYPE::ADD;
 		break;
 	case SUB:
-		return EN_OPERATION_TYPE::OP_SUB;
+		return EN_OPERATION_TYPE::SUB;
 		break;
 	case MUL:
-		return EN_OPERATION_TYPE::OP_MUL;
+		return EN_OPERATION_TYPE::MUL;
 		break;
 	case DIV:
-		return EN_OPERATION_TYPE::OP_DIV;
+		return EN_OPERATION_TYPE::DIV;
 		break;
 	case QT_MIX:
 		return generate_random_operation_type();
@@ -197,19 +197,19 @@ EN_QUESTIONS_LEVEL read_questions_level() {
 	return questions_level;
 }
 
-bool is_valid_questions_type(EN_QUESTIONS_TYPE question_type) {
-	return is_in_range(question_type, EN_QUESTIONS_TYPE::ADD, EN_QUESTIONS_TYPE::QT_MIX);
+bool is_valid_operation_type(EN_OPERATION_TYPE question_type) {
+	return is_in_range(question_type, EN_OPERATION_TYPE::ADD, EN_OPERATION_TYPE::QT_MIX);
 }
 
-EN_QUESTIONS_TYPE read_questions_type() {
-	EN_QUESTIONS_TYPE question_type;
+EN_OPERATION_TYPE read_operation_type() {
+	EN_OPERATION_TYPE question_type;
 	while (true) {
-		question_type = (EN_QUESTIONS_TYPE)read_positive_number("Enter Operation Type [1] " + question_type_text[EN_QUESTIONS_TYPE::ADD]
-		+" [2] " + question_type_text[EN_QUESTIONS_TYPE::SUB] 
-		+" [3] " + question_type_text[EN_QUESTIONS_TYPE::MUL]
-		+" [4] "+ question_type_text[EN_QUESTIONS_TYPE::DIV]
-		+" [5] " + question_type_text[EN_QUESTIONS_TYPE::QT_MIX]);
-		if (is_valid_questions_type(question_type)) {
+		question_type = (EN_OPERATION_TYPE)read_positive_number("Enter Operation Type [1] " + operation_type_text[EN_OPERATION_TYPE::ADD]
+		+" [2] " + operation_type_text[EN_OPERATION_TYPE::SUB]
+		+" [3] " + operation_type_text[EN_OPERATION_TYPE::MUL]
+		+" [4] "+ operation_type_text[EN_OPERATION_TYPE::DIV]
+		+" [5] " + operation_type_text[EN_OPERATION_TYPE::QT_MIX]);
+		if (is_valid_operation_type(question_type)) {
 			break;
 		}
 	}
@@ -243,7 +243,7 @@ void ask_question(Question& question,const int &question_number,const int &total
 	cout << "Question [" << question_number << "/" << total_num_questions << "]" << endl;
 	cout << endl;
 	cout << question.number_one << endl;
-	cout << question.number_two << " " << operation_type_char[question.operation_type] << endl;
+	cout << question.number_two << " " << operation_type_symbol[question.operation_type] << endl;
 	cout << "_________" << endl;
 	question.user_answer = read_user_answer();
 	question.question_result = get_question_result(question);
@@ -254,16 +254,16 @@ void ask_question(Question& question,const int &question_number,const int &total
 double get_correct_result(const Question& question) {
 	switch (question.operation_type)
 	{
-	case EN_QUESTIONS_TYPE::ADD :
+	case EN_OPERATION_TYPE::ADD :
 		return question.number_one + question.number_two;
 		break;
-	case EN_QUESTIONS_TYPE::SUB:
+	case EN_OPERATION_TYPE::SUB:
 		return question.number_one - question.number_two;
 		break;
-	case EN_QUESTIONS_TYPE::MUL:
+	case EN_OPERATION_TYPE::MUL:
 		return question.number_one * question.number_two;
 		break;
-	case EN_QUESTIONS_TYPE::DIV:
+	case EN_OPERATION_TYPE::DIV:
 		if (question.number_two == 0) {
 			return 0; 
 		}
@@ -279,7 +279,7 @@ double get_correct_result(const Question& question) {
 void generate_question(Question& question, const Quiz& quiz) {
 	question.number_one = generate_number_based_on_questions_level(quiz.questions_level);
 	question.number_two = generate_number_based_on_questions_level(get_questions_level_based_on_number_generated(question.number_one));
-	question.operation_type = get_operation_type(quiz.questions_type);
+	question.operation_type = get_operation_type(quiz.operation_type);
 	question.correct_answer = get_correct_result(question);
 }
 
@@ -299,7 +299,7 @@ void display_question_result(const Question &question) {
 void read_quiz_info(Quiz& quiz) {
 	quiz.num_quetions = read_positive_number("How many question do you want to answer ? ");
 	quiz.questions_level = read_questions_level();
-	quiz.questions_type = read_questions_type();
+	quiz.operation_type = read_operation_type();
 }
 
 int get_number_of_right_answers_per_quiz(const Quiz& quiz) {
@@ -317,7 +317,7 @@ int get_number_of_wrong_answers_per_quiz(const Quiz& quiz) {
 }
 
 EN_QUIZ_RESULT get_quiz_result(const Quiz& quiz) {
-	if (get_number_of_wrong_answers_per_quiz(quiz) != 0) {
+	if (get_number_of_wrong_answers_per_quiz(quiz) > get_number_of_right_answers_per_quiz(quiz)) {
 		return EN_QUIZ_RESULT::FAIL;
 	}
 	return EN_QUIZ_RESULT::PASS;
@@ -349,7 +349,7 @@ void display_quiz_results(Quiz& quiz) {
 	display_quiz_result_header(quiz);
 	cout << "Number of questions     : " << quiz.num_quetions << endl;
 	cout << "Questions Level         : " << questions_level_text[quiz.questions_level] << endl;
-	cout << "Operation Type          : " << question_type_text[quiz.questions_type] << endl;
+	cout << "Operation Type          : " << operation_type_text[quiz.operation_type] << endl;
 	cout << "Number of right answers : " << quiz.number_right_answers << endl;
 	cout << "Number of wrong answers : " << quiz.number_wrong_answers << endl;
 	change_screen_color_based_on_quiz_reult(quiz);
@@ -368,7 +368,7 @@ void reset_question(Question& question) {
 	question.question_number=-1;
 	question.number_one=-1;
 	question.number_two=-1;
-	question.operation_type=EN_OPERATION_TYPE::OP_NOT_KNOWN;
+	question.operation_type=EN_OPERATION_TYPE::NOT_KNOWN;
 	question.user_answer=-1;
 	question.correct_answer=-1;
 	question.question_result= EN_QUESTION_RESULT::QUESTION_RESULT_NOT_KNOWN;
@@ -384,7 +384,7 @@ void reset_quiz(Quiz &quiz) {
 	clear_screen();
 	quiz.num_quetions=-1;
 	quiz.questions_level=EN_QUESTIONS_LEVEL::LVL_NOT_KNOWN;
-	quiz.questions_type= EN_QUESTIONS_TYPE::NOT_KNOWN;
+	quiz.operation_type= EN_OPERATION_TYPE::NOT_KNOWN;
 	reset_all_quiz_questions(quiz);
 	quiz.number_right_answers=-1;
 	quiz.number_wrong_answers=-1;
@@ -421,8 +421,9 @@ void start_quiz(Quiz &quiz) {
 }
 
 //take quiz
-void take_quiz(Quiz& quiz) {
+void take_quiz() {
 	
+	Quiz quiz;
 	while (true) {
 		
 		//start quiz
@@ -439,9 +440,9 @@ void take_quiz(Quiz& quiz) {
 int main()
 {
 	srand(time(nullptr));
-	Quiz quiz;
 	
-	take_quiz(quiz);
+	
+	take_quiz();
 	return 0;
 }
 
