@@ -405,18 +405,23 @@ EN_TAKE_ONOTHER_QUIZ want_to_take_another_quiz() {
 	return (toupper(take_another_quiz) == 'Y' ? EN_TAKE_ONOTHER_QUIZ::YES : EN_TAKE_ONOTHER_QUIZ::NO);
 }
 
-void start_quiz(Quiz& quiz) {
+void start_quiz(Quiz &quiz) {
+	reset_quiz(quiz);
+	read_quiz_info(quiz);
+	for (int i = 0; i < quiz.num_quetions; i++) {
+		generate_question(quiz.questions[i], quiz);
+		ask_question(quiz.questions[i], i + 1, quiz.num_quetions);
+		display_question_result(quiz.questions[i]);
+	}
+	generate_quiz_results(quiz);
+	display_quiz_results(quiz);
+}
+
+void take_quiz(Quiz& quiz) {
 	
 	while (true) {
-		reset_quiz(quiz);
-		read_quiz_info(quiz);
-		for (int i = 0; i < quiz.num_quetions; i++) {
-			generate_question(quiz.questions[i], quiz);
-			ask_question(quiz.questions[i], i + 1, quiz.num_quetions);
-			display_question_result(quiz.questions[i]);
-		}
-		generate_quiz_results(quiz);
-		display_quiz_results(quiz);
+		
+		start_quiz(quiz);
 		if (want_to_take_another_quiz() == EN_TAKE_ONOTHER_QUIZ::NO) {
 			break;
 		}
@@ -430,7 +435,7 @@ int main()
 {
 	srand(time(nullptr));
 	Quiz quiz;
-	start_quiz(quiz);
+	take_quiz(quiz);
 	return 0;
 }
 
